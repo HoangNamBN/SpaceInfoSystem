@@ -1,0 +1,577 @@
+﻿<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Bản đồ quận Đống Đa</title>
+        <script src="../JQuery/jquery-3.1.1.min.js" type="text/javascript">
+    </script>
+        <script src="../JS/ol.js" type="text/javascript"></script>
+        <script src="../CSS/ol.css" type="text/javascript"></script>
+        <link rel="stylesheet" href="../CSS/style.css" />
+        <style>
+        .map {
+            height: 600px;
+            width: 75%;
+            float: left;
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+
+        .map {
+            border: 1px solid #000;
+        }
+    </style>
+        <script type="text/javascript">
+        $("#document").ready(function () {
+            var container = document.getElementById('popup');
+            var content = document.getElementById('popup-content');
+            var closer = document.getElementById('popup-closer');
+            var overlay = new ol.Overlay(({
+                element: container,
+                autoPan: true,
+                autoPanAnimation: {
+                    duration: 250
+                }
+            }));
+            closer.onclick = function () {
+                overlay.setPosition(undefined);
+                closer.blur();
+                return false;
+            };
+            var format = 'image/png';
+
+            var bounds = [105.79039764404297, 20.990598678588867, 105.86390686035156, 21.033000946044922];
+
+            var ATM = new ol.layer.Image({
+                source: new ol.source.ImageWMS({
+                    ratio: 1,
+                    url: 'http://localhost:8080/geoserver/BIDV/wms',
+                    params: {
+                        'FORMAT': format,
+                        'VERSION': '1.1.1',  
+                        STYLES: '',
+                        LAYERS: 'BIDV:atm',
+                    }
+                })
+            });
+
+            var buildings = new ol.layer.Image({
+                source: new ol.source.ImageWMS({
+                    ratio: 1,
+                    url: 'http://localhost:8080/geoserver/BIDV/wms',
+                    params: {
+                        'FORMAT': format, 
+                        'VERSION': '1.1.1',
+                        STYLES: '',
+                        LAYERS: 'BIDV:buildings',
+                    }
+                })
+            });
+
+            var landuse = new ol.layer.Image({
+                source: new ol.source.ImageWMS({
+                    ratio: 1,
+                    url: 'http://localhost:8080/geoserver/BIDV/wms',
+                    params: {
+                        'FORMAT': format,
+                        'VERSION': '1.1.1',  
+                        STYLES: '',
+                        LAYERS: 'BIDV:landuse',
+                    }
+                })
+            });
+
+            var natural = new ol.layer.Image({
+                source: new ol.source.ImageWMS({
+                    ratio: 1,
+                    url: 'http://localhost:8080/geoserver/BIDV/wms',
+                    params: {
+                        'FORMAT': format,
+                        'VERSION': '1.1.1',  
+                        STYLES: '',
+                        LAYERS: 'BIDV:natural',
+                    }
+                })
+            });
+
+            var Roads = new ol.layer.Image({
+                source: new ol.source.ImageWMS({
+                    ratio: 1,
+                    url: 'http://localhost:8080/geoserver/BIDV/wms',
+                    params: {
+                        'FORMAT': format,
+                        'VERSION': '1.1.1',  
+                        STYLES: '',
+                        LAYERS: 'BIDV:roads',
+                    }
+                })
+            });
+
+            var railways = new ol.layer.Image({
+                source: new ol.source.ImageWMS({
+                    ratio: 1,
+                    url: 'http://localhost:8080/geoserver/BIDV/wms',
+                    params: {
+                        'FORMAT': format,
+                        'VERSION': '1.1.1',  
+                        STYLES: '',
+                        LAYERS: 'BIDV:railways',
+                    }
+                })
+            });
+
+            var waterways = new ol.layer.Image({
+                source: new ol.source.ImageWMS({
+                    ratio: 1,
+                    url: 'http://localhost:8080/geoserver/BIDV/wms',
+                    params: {
+                        'FORMAT': format, 
+                        'VERSION': '1.1.1',
+                        STYLES: '',
+                        LAYERS: 'BIDV:waterways',
+                    }
+                })
+            });
+
+
+            var projection = new ol.proj.Projection({
+                code: 'EPSG:4326',
+                units: 'degrees',
+                axisOrientation: 'neu',
+                global: true
+            });
+
+            var view = new ol.View({
+                projection: projection
+            });
+
+            var map = new ol.Map({
+                target: 'map',
+                layers: [
+                    waterways, railways, Roads, natural, landuse, buildings, ATM   
+                ],
+                overlays: [overlay],
+                view: view
+
+            });
+
+            var styles = {
+                'MultiPolygon': new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                        color: 'yellow',
+                        width: 3
+                    })
+                })
+            };
+
+            var styleFunction = function (feature) {
+                return styles[feature.getGeometry().getType()];
+            };
+
+            var vectorLayer = new ol.layer.Vector({
+                style: styleFunction
+            });
+            map.addLayer(vectorLayer);
+
+            var vectorLayer1 = new ol.layer.Vector({
+                style: styleFunction
+            });
+            map.addLayer(vectorLayer1);
+
+            var vectorLayer2 = new ol.layer.Vector({
+                style: styleFunction
+            });
+            map.addLayer(vectorLayer2);
+            map.getView().fit(bounds, map.getSize());
+
+
+            $("#chkATM").change(function () {
+                if ($("#chkATM").is(":checked")) {
+                    ATM.setVisible(true);
+                }
+                else {
+                    ATM.setVisible(false);
+                }
+            });
+
+            $("#chkBuildings").change(function () {
+                if ($("#chkBuildings").is(":checked")) {
+                    buildings.setVisible(true);
+                }
+                else {
+                    buildings.setVisible(false);
+                }
+            });
+
+            $("#chkrg").change(function () {
+                if ($("#chkrg").is(":checked")) {
+                    landuse.setVisible(true);
+                }
+                else {
+                    landuse.setVisible(false);
+                }
+            });
+
+            $("#chkNatural").change(function () {
+                if ($("#chkNatural").is(":checked")) {
+                    natural.setVisible(true);
+                }
+                else {
+                    natural.setVisible(false);
+                }
+            });
+
+            $("#chkRoads").change(function () {
+                if ($("#chkRoads").is(":checked")) {
+                    Roads.setVisible(true);
+                }
+                else {
+                    Roads.setVisible(false);
+                }
+            });
+
+            $("#chkRailways").change(function () {
+                if ($("#chkRailways").is(":checked")) {
+                    railways.setVisible(true);
+                }
+                else {
+                    railways.setVisible(false);
+                }
+            });
+
+            $("#chkwaterway").change(function () {
+                if ($("#chkwaterway").is(":checked")) {
+                    waterways.setVisible(true);
+                }
+                else {
+                    waterways.setVisible(false);
+                }
+            });
+
+            map.on('singleclick', function (evt) {
+                var view = map.getView();
+                var viewResolution = view.getResolution();
+                var source = ATM.getSource();
+                var url = source.getGetFeatureInfoUrl(
+                    evt.coordinate, viewResolution, view.getProjection(),
+                    { 'INFO_FORMAT': 'application/json', 'FEATURE_COUNT': 50 });
+                if (url) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: 'json',
+                        success: function (n) {
+                            var content = "<table border=1 style='border-collapse:collapse'>";
+                            for (var i = 0; i < n.features.length; i++) {
+                                var feature = n.features[i];
+                                var featureAttr = feature.properties;
+                                content += "<tr><td>Tên Ngân Hàng</td><td>" + featureAttr["nganhang"] + "</td></tr>"
+                            }
+                            content += "</table>";
+                            $("#popup-content").html(content);
+                            overlay.setPosition(evt.coordinate);
+                            var vectorSource1 = new ol.source.Vector({
+                                features: (new ol.format.GeoJSON()).readFeatures(n)
+                            });
+                            vectorLayer1.setSource(vectorSource1);
+                        }
+                    });
+                }
+            });
+
+            map.on('singleclick', function (evt) {
+                var view = map.getView();
+                var viewResolution = view.getResolution();
+                var source = buildings.getSource();
+                var url = source.getGetFeatureInfoUrl(
+                    evt.coordinate, viewResolution, view.getProjection(),
+                    { 'INFO_FORMAT': 'application/json', 'FEATURE_COUNT': 50 });
+                if (url) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: 'json',
+                        success: function (n) {
+                            var content = "<table border=1 style='border-collapse:collapse'>";
+                            for (var i = 0; i < n.features.length; i++) {
+                                var feature = n.features[i];
+                                var featureAttr = feature.properties;
+                                content +=                               
+                                    "<tr><td>Tên tòa nhà</td><td>" + featureAttr["name"] + "</td></tr>"
+                                    + "<tr><td>Loại</td><td>" + featureAttr["type"] + "</td></tr>"
+                            }
+                            content += "</table>";
+                            $("#popup-content").html(content);
+                            overlay.setPosition(evt.coordinate);
+                            var vectorSource1 = new ol.source.Vector({
+                                features: (new ol.format.GeoJSON()).readFeatures(n)
+                            });
+                            vectorLayer1.setSource(vectorSource1);
+                        }
+                    });
+                }
+            });
+
+            
+
+            map.on('singleclick', function (evt) {
+                var view = map.getView();
+                var viewResolution = view.getResolution();
+                var source = landuse.getSource();
+                var url = source.getGetFeatureInfoUrl(
+                    evt.coordinate, viewResolution, view.getProjection(),
+                    { 'INFO_FORMAT': 'application/json', 'FEATURE_COUNT': 50 });
+                if (url) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: 'json',
+                        success: function (n) {
+                            var content = "<table border=1 style='border-collapse:collapse'>";
+                            for (var i = 0; i < n.features.length; i++) {
+                                var feature = n.features[i];
+                                var featureAttr = feature.properties;
+                                content +=
+                                    "<tr><td>Tên Khu Đất</td><td>" + featureAttr["name"] + "</td></tr>"
+                                    + "<tr><td>Loại</td><td>" + featureAttr["type"] + "</td></tr>"
+                            }
+                            content += "</table>";
+                            $("#popup-content").html(content);
+                            overlay.setPosition(evt.coordinate);
+                            var vectorSource1 = new ol.source.Vector({
+                                features: (new ol.format.GeoJSON()).readFeatures(n)
+                            });
+                            vectorLayer1.setSource(vectorSource1);
+                        }
+                    });
+                }
+            });
+
+            map.on('singleclick', function (evt) {
+                var view = map.getView();
+                var viewResolution = view.getResolution();
+                var source = natural.getSource();
+                var url = source.getGetFeatureInfoUrl(
+                    evt.coordinate, viewResolution, view.getProjection(),
+                    { 'INFO_FORMAT': 'application/json', 'FEATURE_COUNT': 50 });
+                if (url) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: 'json',
+                        success: function (n) {
+                            var content = "<table border=1 style='border-collapse:collapse'>";
+                            for (var i = 0; i < n.features.length; i++) {
+                                var feature = n.features[i];
+                                var featureAttr = feature.properties;
+                                content +="<tr><td>Tên Công viên, hồ:</td><td>" + featureAttr["name"] + "</td></tr>"
+                                    + "<tr><td>Loại :</td><td>" + featureAttr["type"] + "</td></tr>"
+                            }
+                            content += "</table>";
+                            $("#popup-content").html(content);
+                            overlay.setPosition(evt.coordinate);
+                            var vectorSource1 = new ol.source.Vector({
+                                features: (new ol.format.GeoJSON()).readFeatures(n)
+                            });
+                            vectorLayer1.setSource(vectorSource1);
+                        }
+                    });
+                }
+            });
+
+            map.on('singleclick', function (evt) {
+                var view = map.getView();
+                var viewResolution = view.getResolution();
+                var source = Roads.getSource();
+                var url = source.getGetFeatureInfoUrl(
+                    evt.coordinate, viewResolution, view.getProjection(),
+                    { 'INFO_FORMAT': 'application/json', 'FEATURE_COUNT': 50 });
+                if (url) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: 'json',
+                        success: function (n) {
+                            var content = "<table border=1 style='border-collapse:collapse'>";
+                            for (var i = 0; i < n.features.length; i++) {
+                                var feature = n.features[i];
+                                var featureAttr = feature.properties;
+                                content +=
+                                    "<tr><td>Tên Đường</td><td>" + featureAttr["name"] + "</td></tr>"
+                                    + "<tr><td>Loại </td><td>" + featureAttr["type"] + "</td></tr>"
+                                    + "<tr><td>Oneway </td><td>" + featureAttr["oneway"] + "</td></tr>"
+                            }
+                            content += "</table>";
+                            $("#popup-content").html(content);
+                            overlay.setPosition(evt.coordinate);
+                            var vectorSource = new ol.source.Vector({
+                                features: (new ol.format.GeoJSON()).readFeatures(n)
+                            });
+                            vectorLayer.setSource(vectorSource);
+                        }
+                    });
+                }
+            });
+
+            map.on('singleclick', function (evt) {
+                var view = map.getView();
+                var viewResolution = view.getResolution();
+                var source = railways.getSource();
+                var url = source.getGetFeatureInfoUrl(
+                    evt.coordinate, viewResolution, view.getProjection(),
+                    { 'INFO_FORMAT': 'application/json', 'FEATURE_COUNT': 50 });
+                if (url) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: 'json',
+                        success: function (n) {
+                            var content = "<table border=1 style='border-collapse:collapse'>";
+                            for (var i = 0; i < n.features.length; i++) {
+                                var feature = n.features[i];
+                                var featureAttr = feature.properties;
+                                content +=
+                                    "<tr><td>Tên đường sắt:</td><td>" + featureAttr["name"] + "</td></tr>"
+                                    + "<tr><td>Loại :</td><td>" + featureAttr["type"] + "</td></tr>"
+                            }
+                            content += "</table>";
+                            $("#popup-content").html(content);
+                            overlay.setPosition(evt.coordinate);
+                            var vectorSource = new ol.source.Vector({
+                                features: (new ol.format.GeoJSON()).readFeatures(n)
+                            });
+                            vectorLayer.setSource(vectorSource);
+                        }
+                    });
+                }
+            });
+
+            map.on('singleclick', function (evt) {
+                var view = map.getView();
+                var viewResolution = view.getResolution();
+                var source = waterways.getSource();
+                var url = source.getGetFeatureInfoUrl(
+                    evt.coordinate, viewResolution, view.getProjection(),
+                    { 'INFO_FORMAT': 'application/json', 'FEATURE_COUNT': 50 });
+                if (url) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: 'json',
+                        success: function (n) {
+                            var content = "<table border=1 style='border-collapse:collapse'>";
+                            for (var i = 0; i < n.features.length; i++) {
+                                var feature = n.features[i];
+                                var featureAttr = feature.properties;
+                                content +=
+                                    "<tr><td>Tên sông:</td><td>" + featureAttr["name"] + "</td></tr>"
+                                    + "<tr><td>Loại :</td><td>" + featureAttr["type"] + "</td></tr>"
+                            }
+                            content += "</table>";
+                            $("#popup-content").html(content);
+                            overlay.setPosition(evt.coordinate);
+                            var vectorSource = new ol.source.Vector({
+                                features: (new ol.format.GeoJSON()).readFeatures(n)
+                            });
+                            vectorLayer.setSource(vectorSource);
+                        }
+                    });
+                }
+            });
+
+        });
+
+    </script>
+    </head>
+
+    <body>
+        <center>
+            <h1>Bản đồ BIDV Quận Đống Đa</h1>
+        </center>
+        <div id="map" class="map"></div>
+        <div id="chugiai" class="chugiai">
+            <div id="checkmap" class="checkmap">
+                <table border=1 style='border-collapse:collapse'>
+                    <tr>
+                        <td
+                            style="width:300px;font-size:20px;margin-left:30px;">Annotate
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="checkmap" class="checkmap">
+                <input type="checkbox" id="chkATM" checked style="float:left" />
+                <label for="chkATM" style="float:left">ATM</label>
+                <img
+                    src="http://localhost:8080/geoserver/BIDV/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=BIDV:atm"
+                    />
+            </div>
+
+            <div id="checkmap" class="checkmap">
+                <input type="checkbox" id="chkwaterway" checked
+                    style="float:left" />
+                <label for="chkwaterway" style="float:left">Waterways</label>
+                <img
+                    src="http://localhost:8080/geoserver/BIDV/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=BIDV:waterways"
+                    />
+            </div>
+
+            <div id="checkmap" class="checkmap">
+                <input type="checkbox" id="chkNatural" checked
+                    style="float:left" />
+                <label for="chkNatural" style="float:left">Natural</label>
+                <img
+                    src="http://localhost:8080/geoserver/BIDV/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=BIDV:natural"
+                    />
+            </div>
+
+            <div id="checkmap" class="checkmap">
+                <input type="checkbox" id="chkRoads" checked style="float:left"
+                    />
+                <label for="chkThuaDat" style="float:left">Roads</label>
+                <img
+                    src="http://localhost:8080/geoserver/BIDV/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=BIDV:roads"
+                    />
+            </div>
+
+            <div id="checkmap" class="checkmap">
+                <input type="checkbox" id="chkBuildings" checked
+                    style="float:left" />
+                <label for="chkBuildings" style="float:left">Buildings</label>
+                <img
+                    src="http://localhost:8080/geoserver/BIDV/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=BIDV:buildings"
+                    />
+            </div>
+
+            <div id="checkmap" class="checkmap">
+                <input type="checkbox" id="chkRailways" checked
+                    style="float:left" />
+                <label for="chkRailways" style="float:left">Railways</label>
+                <img
+                    src="http://localhost:8080/geoserver/BIDV/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=BIDV:railways"
+                    />
+            </div>
+
+            <div id="checkmap" class="checkmap">
+                <input type="checkbox" id="chkrg" checked style="float:left" />
+                <label for="chkrg" style="float:left">Landuse</label>
+                <img
+                    src="http://localhost:8080/geoserver/BIDV/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=BIDV:landuse"
+                    />
+            </div>
+
+        </div>
+        <div id="info"></div>
+
+        <div id="popup" class="ol-popup">
+            <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+            <div id="popup-content"></div>
+        </div>
+
+    </body>
+</html>
