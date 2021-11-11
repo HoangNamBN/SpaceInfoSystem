@@ -39,7 +39,8 @@
             };
             var format = 'image/png';
 
-            var bounds = [105.79039764404297, 20.990598678588867, 105.86390686035156, 21.033000946044922];
+            var bounds = [105.79039764404297, 20.990598678588867, 
+                          105.86390686035156, 21.033000946044922];
 
             var ATM = new ol.layer.Image({
                 source: new ol.source.ImageWMS({
@@ -151,7 +152,6 @@
                 ],
                 overlays: [overlay],
                 view: view
-
             });
 
             var styles = {
@@ -553,7 +553,9 @@
                 src="http://localhost:8080/geoserver/BIDV/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=BIDV:landuse" />
         </div>
     </div>
+    
     <div id="info"></div>
+
     <div id="popup" class="ol-popup">
         <a href="#" id="popup-closer" class="ol-popup-closer"></a>
         <div id="popup-content"></div>
